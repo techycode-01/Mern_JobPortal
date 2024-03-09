@@ -2,6 +2,8 @@
 
 Welcome to the MERN Full Stack Job Portal Project! This web application is designed to facilitate job seekers in finding suitable employment opportunities and recruiters in posting and managing job listings. Built using the MERN stack (MongoDB, Express.js, React, Node.js), along with Firebase Authentication and Tailwind CSS, this portal provides a seamless experience for users exploring career opportunities.
 
+<a href="https://buybusyshop.netlify.app/">Go Live to Website</a>
+
 ## Features
 
 - **User Authentication**: Secure user authentication provided by Firebase Authentication. Users can sign up and log in using email and password.
