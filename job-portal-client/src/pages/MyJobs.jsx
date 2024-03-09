@@ -15,7 +15,7 @@ const MyJobs = () => {
   // console.log(control)
   useEffect(() => {
     setIsLoading(true);
-    fetch(`${import.meta.BACKEND_URL}/myJobs/${user?.email}`)
+    fetch(`https://mern-jobportal-ckfs.onrender.com/myJobs/${user?.email}`)
       .then((res) => res.json())
       .then((data) => {
         // console.log(data);
@@ -50,7 +50,7 @@ const MyJobs = () => {
   // delete a books
   const handleDelete = (id) => {
     // console.log(id)
-    fetch(`${import.meta.BACKEND_URL}/job/${id}`, {
+    fetch(`https://mern-jobportal-ckfs.onrender.com/job/${id}`, {
       method: "DELETE",
     })
       .then((res) => res.json())

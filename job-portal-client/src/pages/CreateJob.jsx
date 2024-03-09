@@ -19,7 +19,7 @@ const CreateJob = () => {
 
   const onSubmit = (data) => {
     data.skills = selectedOption;
-    fetch(`${import.meta.BACKEND_URL}/post-job`, {
+    fetch(`https://mern-jobportal-ckfs.onrender.com/post-job`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),

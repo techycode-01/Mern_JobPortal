@@ -9,7 +9,7 @@ const JobDetails = () => {
   console.log(id);
   const [job, setJob] = useState([]);
   useEffect(() => {
-    fetch(`${import.meta.BACKEND_URL}/all-jobs/${id}`)
+    fetch(`https://mern-jobportal-ckfs.onrender.com/all-jobs/${id}`)
       .then((res) => res.json())
       .then((data) => setJob(data));
   }, []);

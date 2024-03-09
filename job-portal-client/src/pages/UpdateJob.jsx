@@ -37,7 +37,7 @@ const UpdateJob = () => {
     data.skills = selectedOption;
     // console.log(data)
 
-    fetch(`${import.meta.BACKEND_URL}/update-job/${id}`, {
+    fetch(`https://mern-jobportal-ckfs.onrender.com/update-job/${id}`, {
       method: "PATCH",
       headers: {
         "Content-type": "application/json",
