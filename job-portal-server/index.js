@@ -34,6 +34,7 @@ async function run() {
 
     app.post("/post-job", async (req, res) => {
       const body = req.body;
+      console.log(body)
       body.createdAt = new Date();
       const result = await jobsCollection.insertOne(body);
       if (result?.insertedId) {
