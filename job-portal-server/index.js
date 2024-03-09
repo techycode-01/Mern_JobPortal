@@ -53,6 +53,48 @@ async function run() {
     });
 
     // Other routes...
+   
+   // get single job using id
+   app.get("/all-jobs/:id", async (req, res) => {
+    // console.log(req.params.id);
+    const job = await jobsCollection.findOne({
+      _id: new ObjectId(req.params.id),
+    });
+    res.send(job);
+  });
+
+  // get jobs based on email for my job listing 
+  app.get("/myJobs/:email", async (req, res) => {
+    // console.log("email---", req.params.email);
+    const jobs = await jobsCollection.find({ postedBy: req.params.email, }).toArray();
+    res.send(jobs);
+  });
+
+
+  // delete a job
+  app.delete("/job/:id", async (req, res) => {
+    const id = req.params.id;
+    const filter = { _id: new ObjectId(id) };
+    const result = await jobsCollection.deleteOne(filter);
+    res.send(result);
+  })
+
+  // updata a job
+  app.patch("/update-job/:id", async (req, res) => {
+    const id = req.params.id;
+    const jobData = req.body;
+    // console.log(body);
+    const filter = { _id: new ObjectId(id) };
+    const updateDoc = {
+      $set: {
+        ...jobData
+      },
+    };
+    const options = { upsert: true };
+    const result = await jobsCollection.updateOne(filter, updateDoc, options);
+    res.send(result);
+  });
+
 
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
