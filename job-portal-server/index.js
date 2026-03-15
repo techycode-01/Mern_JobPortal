@@ -13,7 +13,7 @@ app.use(cors({
   credentials: true
 }));
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@job-portal-demo.krv6aeo.mongodb.net`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@job-portal.hqdzpij.mongodb.net/?appName=Job-portal`;
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
