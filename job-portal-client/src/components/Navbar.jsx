@@ -7,7 +7,7 @@ import { AuthContext } from "../context/AuthProvider";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logOut } = useContext(AuthContext);
-  console.log(user)
+
 
   
   const handleLogout = () => {
@@ -72,7 +72,7 @@ const Navbar = () => {
           {user ? (
             <>
               <div className="flex gap-4 items-center">
-                <div class="flex -space-x-2 overflow-hidden">
+                <div className="flex -space-x-2 overflow-hidden">
                   {
                     user?.photoURL ? <> <img
                     className="inline-block h-10 w-10 rounded-full ring-2 ring-white"

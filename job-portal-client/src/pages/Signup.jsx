@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
 import { AuthContext } from "../context/AuthProvider";
+import toast from "react-hot-toast";
 
 const SignUp = () => {
   const [errorMessage, setErrorMessage] = useState("");
@@ -17,17 +17,17 @@ const SignUp = () => {
 
     // Simple validation for password match
     if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
       setErrorMessage("Passwords do not match");
       return;
     }
 
     try {
-      // Call createUser function from authentication provider
       await createUser(email, password);
-      // After successful signup, navigate the user to another page, for example, the login page
+      toast.success("Account created successfully!");
       navigate("/login");
     } catch (error) {
-      console.error("Error signing up:", error.message);
+      toast.error(error.message || "Failed to sign up.");
       setErrorMessage(error.message);
     }
   };

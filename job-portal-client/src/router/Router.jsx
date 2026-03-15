@@ -35,13 +35,21 @@ const router = createBrowserRouter([
       },
       {
         path: "/post-job",
-        element: <CreateJob />,
+        element: (
+          <PrivateRoute>
+            <CreateJob />
+          </PrivateRoute>
+        ),
       },
       {
         path: "edit-job/:id",
-        element: <UpdateJob />,
+        element: (
+          <PrivateRoute>
+            <UpdateJob />
+          </PrivateRoute>
+        ),
         loader: ({ params }) =>
-          fetch(`https://mern-jobportal-ckfs.onrender.com/all-jobs/${params.id}`),
+          fetch(`${import.meta.env.VITE_API_URL}/all-jobs/${params.id}`),
       },
       {
         path: "/jobs/:id",

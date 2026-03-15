@@ -1,78 +1,114 @@
 # MERN Stack Job Portal
 
-Welcome to the MERN Full Stack Job Portal Project! This web application is designed to facilitate job seekers in finding suitable employment opportunities and recruiters in posting and managing job listings. Built using the MERN stack (MongoDB, Express.js, React, Node.js), along with Firebase Authentication and Tailwind CSS, this portal provides a seamless experience for users exploring career opportunities.
+A modern, full-stack job board built with the MERN stack (MongoDB, Express, React, Node.js) featuring real-time filtering, secure authentication, and a professional recruiter dashboard.
 
-<a href="https://mern-job-portal-eight.vercel.app/">Go Live to Website</a>
+## 🚀 Live Demo
+[Vercel Live Website](https://mern-job-portal-eight.vercel.app/)
 
-## Features
+---
 
-- **User Authentication**: Secure user authentication provided by Firebase Authentication. Users can sign up and log in using email and password.
-- **Job Search**: Job seekers can search for jobs based on various criteria such as job title, location, salary, posting date, work experience, employment type, etc.
-- **Apply for Jobs**: Job seekers can apply for jobs directly through the portal, streamlining the application process.
-- **Recruiter Dashboard**: Recruiters have access to a dashboard where they can post, edit, update, and delete job listings.
-- **Job Filtering**: Users can filter job listings based on different parameters to refine their search results.
-- **Responsive Design**: The portal is optimized for both desktop and mobile devices, ensuring a seamless experience for users on all platforms.
+## ✨ Features
 
-## Technologies Used
+- **🔐 Secure Authentication**: Handled by **Firebase Authentication**. Users can securely sign up, log in, and logout.
+- **🔍 Reactive Search**: Real-time job filtering by **Position** and **Location** in the banner. Results update instantly as you type.
+- **📊 Advanced Filtering**: Refine job searches via the sidebar:
+  - **Salary**: Filter by type (Hourly, Monthly, Yearly) and range.
+  - **Date of Posting**: See jobs from the last 24h, 7 days, or month.
+  - **Experience Level**: Fresher, Internship, or Remote.
+  - **Employment Type**: Full-time, Part-time, Temporary.
+- **💼 Recruiter Dashboard**: 
+  - **Post Jobs**: Simple form with auto-filled 'Posted By' email and skill tags.
+  - **Manage Jobs**: "My Jobs" section to view, edit, and delete job listings you've posted.
+- **🛡️ Protected Routes**: Critical actions like Posting and Editing jobs are protected by `PrivateRoute` to ensure only logged-in users have access.
+- **🔔 Toast Notifications**: Modern, non-intrusive feedback using `react-hot-toast` replaces old browser alerts.
+- **📱 Responsive Design**: Fully responsive UI built with **Tailwind CSS**, optimized for mobile, tablet, and desktop.
 
-- **Frontend**: React.js, Tailwind CSS,Javascript
-- **Backend**: Node.js, Express.js
-- **Database**: MongoDB
-- **Authentication**: Firebase Authentication
+---
 
-## Installation
+## 🛠️ Tech Stack
 
-To run the MERN Stack Job Portal locally, follow these steps:
+**Frontend:**
+- **React.js (Vite)**
+- **Tailwind CSS**
+- **React Router DOM** (Navigation)
+- **React Hook Form** (Forms)
+- **React Select** (Creatable skill tags)
+- **React Hot Toast** (Notifications)
 
-1. Clone the repository:
+**Backend:**
+- **Node.js**
+- **Express.js**
+- **MongoDB** (Database)
+- **Firebase Admin SDK** (Authentication)
 
-   ```bash
-   git clone https://github.com/yourusername/mern-job-portal.git
+---
 
-2. Navigate to the project directory:
+## ⚙️ Installation & Setup
 
-   ```bash
-   cd mern-job-portal
-   ```
-
-3. Install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-4. Create a `.env` file in the root directory and add the required environment variables:
-
-   ```env
-   REACT_APP_API_KEY=your_firebase_api_key
-   REACT_APP_AUTH_DOMAIN=your_firebase_auth_domain
-   REACT_APP_PROJECT_ID=your_firebase_project_id
-   ```
-
-5. Start the development server:
-
-   ```bash
-   npm start
-   ```
-
-6. Open your browser and visit `http://localhost:5000` to view the application.
-
-## Contributing
-
-Contributions are welcome! If you'd like to contribute to the MERN Stack Job Portal, please follow these steps:
-
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/my-feature`).
-3. Make your changes.
-4. Commit your changes (`git commit -am 'Add new feature'`).
-5. Push to the branch (`git push origin feature/my-feature`).
-6. Create a new Pull Request.
-
-## Contact
-
-Have questions or suggestions? Feel free to contact us at [xp27anujkumar@gmail.com](mailto:xp27anujkumar.com).
+### 1. Clone the repository
+```bash
+git clone https://github.com/your-username/Mern_JobPortal.git
+cd Mern_JobPortal
 ```
 
-You can copy and paste this code directly into your README.md file on GitHub.
-Make sure to replace placeholders like `yourusername`, `your@gmail.com`, and environment variable placeholders with actual values in your project.
-This README provides comprehensive information about your project, including features, installation instructions, contribution guidelines, licensing, and contact information.
+### 2. Backend Setup
+```bash
+cd job-portal-server
+npm install
+```
+Create a `.env` file in `job-portal-server/`:
+```env
+DB_USER=your_mongodb_username
+DB_PASSWORD=your_mongodb_password
+PORT=5000
+```
+Run the server:
+```bash
+node index.js
+# or if you have nodemon
+nodemon index.js
+```
+
+### 3. Frontend Setup
+```bash
+cd ../job-portal-client
+npm install
+```
+Create a `.env` file in `job-portal-client/`:
+```env
+VITE_API_URL=http://localhost:5000
+VITE_APIKEY=your_firebase_apikey
+VITE_AUTHDOMAIN=your_firebase_authdomain
+VITE_PROJECTID=your_firebase_projectid
+VITE_STORAGEBUCKET=your_firebase_storagebucket
+VITE_MESSAGINGSENDERID=your_firebase_messaging_sender_id
+VITE_APPID=your_firebase_app_id
+```
+Start the development server:
+```bash
+npm run dev
+```
+
+---
+
+## 🔧 Recent Improvements
+- Refactored home page filtering logic for zero-latency reactive search.
+- Secured all Firebase keys and backend credentials into environment variables.
+- Fixed non-destructive search bug in "My Jobs" and "Salary" pages.
+- Corrected backend `upsert` bug preventing accidental document duplication.
+- Replaced legacy `alert()` calls with professional `toast` notifications.
+
+---
+
+## 🤝 Contributing
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. 
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📧 Contact
+Anuj Kumar - [xp27anujkumar@gmail.com](mailto:xp27anujkumar@gmail.com)
+
+Project Link: [https://github.com/your-username/Mern_JobPortal](https://github.com/your-username/Mern_JobPortal)

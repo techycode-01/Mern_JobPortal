@@ -3,15 +3,16 @@ import PageHeader from "../components/PageHeader";
 import { useParams } from "react-router-dom";
 import { FaBriefcase } from "react-icons/fa6";
 import Swal from "sweetalert2";
+import toast from "react-hot-toast";
 
 const JobDetails = () => {
   const { id } = useParams();
-  console.log(id);
   const [job, setJob] = useState([]);
   useEffect(() => {
-    fetch(`https://mern-jobportal-ckfs.onrender.com/all-jobs/${id}`)
+    fetch(`${import.meta.env.VITE_API_URL}/all-jobs/${id}`)
       .then((res) => res.json())
-      .then((data) => setJob(data));
+      .then((data) => setJob(data))
+      .catch(() => toast.error("Failed to load job details."));
   }, []);
 
   const handleJobApply = async () => {

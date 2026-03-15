@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthProvider";
 import { useLocation, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
@@ -17,9 +18,8 @@ const Login = () => {
     const email = form.email.value;
     const password = form.password.value;
     try {
-      const result = await login(email, password);
-      const user = result.user;
-      alert("Login successful!");
+      await login(email, password);
+      toast.success("Login successful!");
       navigate(from, { replace: true });
     } catch (error) {
       setErrorMessage("Please provide valid email & password!");

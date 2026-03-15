@@ -1,39 +1,40 @@
-/* eslint-disable react/no-unknown-property */
-import React, { useState } from "react";
-import PageHeader from "../components/PageHeader";
-import { FaDollarSign } from "react-icons/fa";
+import React, { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import CreatableSelect from "react-select/creatable";
+import toast from "react-hot-toast";
+import { AuthContext } from "../context/AuthProvider";
 
 const CreateJob = () => {
   const [selectedOption, setSelectedOption] = useState(null);
-
-  // const { user } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset 
+    reset,
   } = useForm();
 
   const onSubmit = (data) => {
     data.skills = selectedOption;
-    fetch(`https://mern-jobportal-ckfs.onrender.com/post-job`, {
+    fetch(`${import.meta.env.VITE_API_URL}/post-job`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     })
       .then((res) => res.json())
       .then((result) => {
-        // console.log(result);
-        if(result.acknowledged === true){
-          alert("Job Posted Successfully!!")
+        if (result.acknowledged === true) {
+          toast.success("Job Posted Successfully!");
+          reset();
+          navigate("/my-job");
+        } else {
+          toast.error("Failed to post job. Please try again.");
         }
-        reset(); // Reset the form
-      });
-
-    // console.log(data)
+      })
+      .catch(() => toast.error("Server error. Please try again."));
   };
 
   const options = [
@@ -47,12 +48,8 @@ const CreateJob = () => {
     { value: "Redux", label: "Redux" },
   ];
 
-  // console.log(watch("example"));
-
   return (
     <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4">
-      {/* <PageHeader title={"Post A Job"} path={"Create Job"} /> */}
-
       {/* form */}
       <div className="bg-[#FAFAFA] py-10 px-4 lg:px-16">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -183,8 +180,8 @@ const CreateJob = () => {
 
           {/* 7th row */}
           <div className="w-full">
-          <label className="block mb-2 text-lg">Job Description</label>
-          <textarea
+            <label className="block mb-2 text-lg">Job Description</label>
+            <textarea
               className="w-full pl-3 py-1.5 focus:outline-none"
               rows={6}
               {...register("description")}
@@ -195,13 +192,13 @@ const CreateJob = () => {
 
           {/* last row */}
           <div className="w-full">
-          <label className="block mb-2 text-lg">Job Posted by</label>
-          <input
-          type="email"
-              // value={user?.email}
-              className="w-full pl-3 py-1.5 focus:outline-none"
+            <label className="block mb-2 text-lg">Job Posted by</label>
+            <input
+              type="email"
+              value={user?.email || ""}
+              readOnly
+              className="w-full pl-3 py-1.5 focus:outline-none bg-gray-100 cursor-not-allowed"
               {...register("postedBy")}
-              placeholder="your email"
             />
           </div>
 

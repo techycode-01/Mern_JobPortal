@@ -90,8 +90,7 @@ async function run() {
         ...jobData
       },
     };
-    const options = { upsert: true };
-    const result = await jobsCollection.updateOne(filter, updateDoc, options);
+    const result = await jobsCollection.updateOne(filter, updateDoc);
     res.send(result);
   });
 

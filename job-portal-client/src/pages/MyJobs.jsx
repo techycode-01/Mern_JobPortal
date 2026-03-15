@@ -1,43 +1,59 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthProvider";
+import toast from "react-hot-toast";
 
 const MyJobs = () => {
   const { user } = useContext(AuthContext);
   const [jobs, setJobs] = useState([]);
+  const [allJobs, setAllJobs] = useState([]); // keep original list for search reset
   const [searchText, setSearchText] = useState("");
-  // console.log(searchText)
   const [isLoading, setIsLoading] = useState(true);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
 
-  // console.log(control)
   useEffect(() => {
     setIsLoading(true);
-    fetch(`https://mern-jobportal-ckfs.onrender.com/myJobs/${user?.email}`)
+    fetch(`${import.meta.env.VITE_API_URL}/myJobs/${user?.email}`)
       .then((res) => res.json())
       .then((data) => {
-        // console.log(data);
         setJobs(data);
+        setAllJobs(data);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        toast.error("Failed to load jobs. Please try again.");
         setIsLoading(false);
       });
-  }, [searchText, user]);
+  }, [user]);
 
   // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentJobs = jobs.slice(indexOfFirstItem, indexOfLastItem);
 
-  // search functionality
+  // search functionality — filters from allJobs without mutating it
   const handleSearch = () => {
-    const filter = jobs.filter(
+    if (!searchText.trim()) {
+      setJobs(allJobs);
+      return;
+    }
+    const filter = allJobs.filter(
       (job) =>
         job.jobTitle.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
     );
-    // console.log(filter);
     setJobs(filter);
-    setIsLoading(false);
+    setCurrentPage(1);
+  };
+
+  // reset search when input is cleared
+  const handleSearchInput = (e) => {
+    setSearchText(e.target.value);
+    if (!e.target.value.trim()) {
+      setJobs(allJobs);
+      setCurrentPage(1);
+    }
   };
 
   // pagination previous and next
@@ -47,41 +63,39 @@ const MyJobs = () => {
     }
   };
 
-  // delete a books
-  const handleDelete = (id) => {
-    // console.log(id)
-    fetch(`https://mern-jobportal-ckfs.onrender.com/job/${id}`, {
-      method: "DELETE",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        // console.log(data);
-        // setAllBooks(data);
-        if (data.acknowledged === true) {
-          alert("Job Deleted Successfully!!");
-          // Filter out the deleted job from the current list of jobs
-          const updatedJobs = jobs.filter((job) => job._id !== id);
-          // Update the jobs state with the updated list
-          setJobs(updatedJobs);
-        }
-      });
-  };
-
   const prevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
   };
 
-  console.log(currentJobs);
-  //
+  // delete a job
+  const handleDelete = (id) => {
+    fetch(`${import.meta.env.VITE_API_URL}/job/${id}`, {
+      method: "DELETE",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.acknowledged === true) {
+          toast.success("Job Deleted Successfully!");
+          const updatedJobs = allJobs.filter((job) => job._id !== id);
+          setJobs(updatedJobs);
+          setAllJobs(updatedJobs);
+        } else {
+          toast.error("Failed to delete job.");
+        }
+      })
+      .catch(() => toast.error("Server error. Please try again."));
+  };
+
   return (
     <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4">
       <div className="my-jobs-container">
         <h1 className="text-center p-4 ">ALL My Jobs</h1>
         <div className="search-box p-2 text-center mb-2">
           <input
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={handleSearchInput}
+            value={searchText}
             type="text"
             className="py-2 pl-3 border focus:outline-none lg:w-6/12 mb-4 w-full"
           />
@@ -140,17 +154,20 @@ const MyJobs = () => {
                     </tr>
                   </thead>
 
-                  {/* set loding here */}
                   {isLoading ? (
-                    <div className="flex items-center justify-center h-20">
-                      <p>loading......</p>
-                    </div>
+                    <tbody>
+                      <tr>
+                        <td colSpan={6} className="text-center p-4">
+                          Loading...
+                        </td>
+                      </tr>
+                    </tbody>
                   ) : (
                     <tbody>
                       {currentJobs.map((job, index) => (
-                        <tr key={index}>
+                        <tr key={job._id}>
                           <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-blueGray-700 ">
-                            {index + 1}
+                            {indexOfFirstItem + index + 1}
                           </th>
                           <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ">
                             {job.jobTitle}

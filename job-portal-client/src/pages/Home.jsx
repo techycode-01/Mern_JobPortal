@@ -4,80 +4,76 @@ import Sidebar from "../Sidebar/Sidebar";
 import Jobs from "./Jobs";
 import Card from "../components/Card";
 import Newsletter from "../components/Newsletter";
+import toast from "react-hot-toast";
 
 const Home = () => {
-  const [selectedCategory, setSelectedCategory] = useState(null);
   const [jobs, setJobs] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Filter States
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [query, setQuery] = useState("");
+  const [location, setLocation] = useState("");
+
+  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setIsLoading(true);
-    fetch(`https://mern-jobportal-ckfs.onrender.com/all-jobs`)
+    fetch(`${import.meta.env.VITE_API_URL}/all-jobs`)
       .then((res) => res.json())
       .then((data) => {
         setJobs(data);
         setIsLoading(false);
+      })
+      .catch(() => {
+        toast.error("Failed to load jobs. Please try again.");
+        setIsLoading(false);
       });
   }, []);
 
-  // ----------- Input Filter -----------
-  const [query, setQuery] = useState("");
-
+  // ----------- Handle Filter Changes -----------
   const handleInputChange = (event) => {
     setQuery(event.target.value);
+    setCurrentPage(1); // Reset to first page on filter change
   };
 
-  const filteredItems = jobs.filter(
-    (job) => job.jobTitle.toLowerCase().indexOf(query.toLowerCase()) !== -1
-  );
+  const handleLocationChange = (event) => {
+    setLocation(event.target.value);
+    setCurrentPage(1); // Reset to first page on filter change
+  };
 
-  // ----------- Radio Filtering -----------
   const handleChange = (event) => {
     setSelectedCategory(event.target.value);
-    // console.log(event.target.value);
+    setCurrentPage(1); // Reset to first page on filter change
   };
 
-  // ------------ Button Filtering -----------
   const handleClick = (event) => {
     setSelectedCategory(event.target.value);
+    setCurrentPage(1); // Reset to first page on filter change
   };
 
-  // Function to calculate the index range for the current page
-  const calculatePageRange = () => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return { startIndex, endIndex };
-  };
-
-  // Function to handle next page
-  const nextPage = () => {
-    if (currentPage < Math.ceil(filteredItems.length / itemsPerPage)) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  // Function to handle previous page
-  const prevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const filteredData = (jobs, selected, query) => {
+  // ----------- Filtering Logic -----------
+  const getFilteredJobs = () => {
     let filteredJobs = jobs;
-    // Filtering Input Items
 
-    console.log(filteredItems);
+    // Filter by Position (query)
     if (query) {
-      filteredJobs = filteredItems;
+      filteredJobs = filteredJobs.filter(
+        (job) => job.jobTitle.toLowerCase().indexOf(query.toLowerCase()) !== -1
+      );
     }
 
-    // Applying selected filter
-    if (selected) {
-      console.log(selected);
+    // Filter by Location
+    if (location) {
+      filteredJobs = filteredJobs.filter(
+        (job) => job.jobLocation.toLowerCase().indexOf(location.toLowerCase()) !== -1
+      );
+    }
 
+    // Filter by Sidebar Category
+    if (selectedCategory) {
       filteredJobs = filteredJobs.filter(
         ({
           jobLocation,
@@ -86,29 +82,66 @@ const Home = () => {
           maxPrice,
           postingDate,
           employmentType,
-        }) =>
-          jobLocation.toLowerCase() === selected.toLowerCase() ||
-          postingDate === selected ||
-          parseInt(maxPrice) <= parseInt(selected) ||
-          salaryType.toLowerCase() === selected.toLowerCase() ||
-          experienceLevel.toLowerCase() === selected.toLowerCase() ||
-          employmentType.toLowerCase() === selected.toLowerCase()
+        }) => {
+          const isLocationMatch = jobLocation?.toLowerCase() === selectedCategory.toLowerCase();
+          const isSalaryTypeMatch = salaryType?.toLowerCase() === selectedCategory.toLowerCase();
+          const isExperienceMatch = experienceLevel?.toLowerCase() === selectedCategory.toLowerCase();
+          const isEmploymentMatch = employmentType?.toLowerCase() === selectedCategory.toLowerCase();
+          
+          // Numerical salary check: only if selectedCategory is a number and doesn't look like a date (yyyy-mm-dd)
+          const isNumericalSelection = !isNaN(selectedCategory) && !selectedCategory.includes("-");
+          const isSalaryRangeMatch = isNumericalSelection && parseInt(maxPrice) <= parseInt(selectedCategory);
+
+          // Date check: show jobs posted on or after the selected date
+          const isDateMatch = postingDate >= selectedCategory;
+
+          return (
+            isLocationMatch ||
+            isSalaryTypeMatch ||
+            isExperienceMatch ||
+            isEmploymentMatch ||
+            isSalaryRangeMatch ||
+            isDateMatch
+          );
+        }
       );
-      console.log(filteredJobs);
     }
 
-    // Slice the data based on the current page
-    const { startIndex, endIndex } = calculatePageRange();
-    filteredJobs = filteredJobs.slice(startIndex, endIndex);
-
-    return filteredJobs.map((data, i) => <Card key={i} data={data} />);
+    return filteredJobs;
   };
 
-  const result = filteredData(jobs, selectedCategory, query);
+  const filteredJobs = getFilteredJobs();
+
+  // ----------- Pagination Logic -----------
+  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
+  
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedJobs = filteredJobs.slice(startIndex, endIndex);
+
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Map result to Card components
+  const result = paginatedJobs.map((data, i) => <Card key={i} data={data} />);
 
   return (
     <div>
-      <Banner query={query} handleInputChange={handleInputChange} />
+      <Banner
+        query={query}
+        handleInputChange={handleInputChange}
+        location={location}
+        handleLocationChange={handleLocationChange}
+      />
 
       {/* main content */}
       <div className="bg-[#FAFAFA] md:grid grid-cols-4 gap-8 lg:px-24 px-4 py-12">
@@ -127,33 +160,27 @@ const Home = () => {
             </>
           )}
 
-          {/* pagination block here */}
-
-          {result.length > 0 ? (
+          {/* pagination block */}
+          {result.length > 0 && (
             <div className="flex justify-center mt-4 space-x-8">
               <button
                 onClick={prevPage}
                 disabled={currentPage === 1}
-                className="hover:underline"
+                className="hover:underline disabled:text-gray-400"
               >
                 Previous
               </button>
               <span className="mx-2">
-                Page {currentPage} of{" "}
-                {Math.ceil(filteredItems.length / itemsPerPage)}
+                Page {currentPage} of {totalPages || 1}
               </span>
               <button
                 onClick={nextPage}
-                disabled={
-                  currentPage === Math.ceil(filteredItems.length / itemsPerPage)
-                }
-                className="hover:underline"
+                disabled={currentPage === totalPages || totalPages === 0}
+                className="hover:underline disabled:text-gray-400"
               >
                 Next
               </button>
             </div>
-          ) : (
-            ""
           )}
         </div>
         <div className="bg-white p-4 rounded">

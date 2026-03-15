@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useLoaderData, useParams } from "react-router-dom";
 import CreatableSelect from "react-select/creatable";
 import PageHeader from "../components/PageHeader";
+import toast from "react-hot-toast";
 
 const UpdateJob = () => {
   const { id } = useParams();
@@ -22,22 +23,18 @@ const UpdateJob = () => {
     skills,
   } = useLoaderData();
 
-  const [selectedOption, setSelectedOption] = useState(null);
-
-  // const { user } = useContext(AuthContext);
+  const [selectedOption, setSelectedOption] = useState(skills || null);
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
     reset,
   } = useForm();
 
   const onSubmit = (data) => {
     data.skills = selectedOption;
-    // console.log(data)
 
-    fetch(`https://mern-jobportal-ckfs.onrender.com/update-job/${id}`, {
+    fetch(`${import.meta.env.VITE_API_URL}/update-job/${id}`, {
       method: "PATCH",
       headers: {
         "Content-type": "application/json",
@@ -46,14 +43,14 @@ const UpdateJob = () => {
     })
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
         if (result.acknowledged === true) {
-          alert("Job Updated Successfully!!");
-          console.log("Resetting form...");
-          reset(); // Reset the form fields after successful update
-          console.log("Form reset.");
+          toast.success("Job Updated Successfully!");
+          reset();
+        } else {
+          toast.error("Failed to update job. Please try again.");
         }
-      });
+      })
+      .catch(() => toast.error("Server error. Please try again."));
   };
 
   const options = [
@@ -66,8 +63,6 @@ const UpdateJob = () => {
     { value: "MongoDB", label: "MongoDB" },
     { value: "Redux", label: "Redux" },
   ];
-
-  // console.log(watch("example"));
 
   return (
     <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4">
@@ -224,11 +219,9 @@ const UpdateJob = () => {
             <label className="block mb-2 text-lg">Job Posted by</label>
             <input
               type="email"
-              // value={user?.email}
-
-              className="w-full pl-3 py-1.5 focus:outline-none"
+              className="w-full pl-3 py-1.5 focus:outline-none bg-gray-100 cursor-not-allowed"
               {...register("postedBy")}
-              placeholder="your email"
+              readOnly
               defaultValue={postedBy}
             />
           </div>
